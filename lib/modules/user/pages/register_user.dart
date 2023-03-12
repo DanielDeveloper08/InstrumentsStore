@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myapp/modules/user/models/user.dart';
 
 import '../../../main.dart';
 import '../../add_instrument/pages/new_screen.dart';
+import '../services/usuarios_provider.dart';
 
 class RegisterUserScreen extends StatefulWidget {
   const RegisterUserScreen({Key? key}) : super(key: key);
@@ -68,6 +70,10 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
                             email: _emailTextController.text,
                             password: _passwordTextController.text)
                         .then((value) {
+                      saveUser(Usuario(
+                          nombres: _userNameTextController.text,
+                          correo: _emailTextController.text,
+                          contrasenia: _passwordTextController.text));
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         duration: const Duration(milliseconds: 2000),
                         content: Container(

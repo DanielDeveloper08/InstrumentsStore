@@ -37,11 +37,14 @@ class _NewInstrument extends State<NewInstrumentScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                Icon(Icons.music_note, size: 24),
+                Icon(Icons.music_note, size: 24, color: Colors.white),
                 SizedBox(width: 5),
                 Text(
                   "Nuevo Instrumento",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ],
             ),

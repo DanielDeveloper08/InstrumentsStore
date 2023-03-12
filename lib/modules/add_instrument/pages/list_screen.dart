@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'dart:ui';
 
-import '../../product/models/instrument.dart';
+import '../../aut/page/login_page.dart';
+import '../models/instrument.dart';
 import 'new_screen.dart';
 
 class ListInstrumentScreen extends StatefulWidget {
@@ -42,6 +44,46 @@ class _ListInstrumentScreenState extends State<ListInstrumentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 40),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(
+                Icons.music_note,
+                size: 24,
+                color: Colors.white,
+              ),
+              SizedBox(width: 8),
+              Text(
+                "Instrumentos",
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.exit_to_app,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -57,17 +99,6 @@ class _ListInstrumentScreenState extends State<ListInstrumentScreen> {
             child: ListView(
               children: <Widget>[
                 const SizedBox(height: 8),
-                Row(
-                  children: const [
-                    Icon(Icons.music_note, size: 24),
-                    SizedBox(width: 8),
-                    Text(
-                      "Instrumentos",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 20),
                 botonNuevoInstrumento(),
                 const SizedBox(height: 20),

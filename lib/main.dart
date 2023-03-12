@@ -1,13 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/modules/cart/services/cart_provider.dart';
 import 'package:myapp/modules/aut/services/login_provider.dart';
-import 'package:myapp/modules/View_client/services/product_provider.dart';
 import 'package:myapp/shared/preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'modules/aut/page/login_page.dart';
-import 'modules/product/services/instruments_providers.dart';
+import 'modules/view-client/page/home_screen.dart';
+import 'modules/view-client/services/instruments_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +26,6 @@ class Provedores extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => InstrumentosProvider()),
-        ChangeNotifierProvider(create: (_) => ProductProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => LoginProvider()),
       ],
       child: const MyApp(),
@@ -45,7 +43,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'My App',
-      home: const LoginPage(),
+      home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else {
+              if (snapshot.hasData) {
+                return HomeScreen();
+              } else {
+                return LoginPage();
+              }
+            }
+          }),
       theme: ThemeData(
         useMaterial3: true,
         appBarTheme: const AppBarTheme(

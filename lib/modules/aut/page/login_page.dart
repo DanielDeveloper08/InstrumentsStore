@@ -1,4 +1,5 @@
 // ignore_for_file: file_names
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/modules/add_instrument/pages/list_screen.dart';
 import 'package:myapp/modules/aut/models/usuario.dart';
@@ -11,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../add_instrument/pages/new_screen.dart';
 import '../../user/pages/register_user.dart';
+import '../../user/services/usuarios_provider.dart';
+import '../../view-client/page/home_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -93,27 +96,26 @@ class _LoginPage extends State<LoginPage> {
                     contrasenia: contraseniaController.text.trim(),
                   );
                   try {
-                    await FirebaseAuth.instance
-                        .signInWithEmailAndPassword(
-                          email: user.usuario,
-                          password: user.contrasenia,
-                        )
-                        .then((value) => {
-                              FirebaseAuth.instance
-                                  .signInWithEmailAndPassword(
-                                      email: user.usuario,
-                                      password: user.contrasenia)
-                                  .then((value) {
-                                Preferences.usuario = user.usuario;
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ListInstrumentScreen(),
-                                  ),
-                                );
-                              })
-                            });
+                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: user.usuario, password: user.contrasenia);
+                    String rolUsuario =
+                        await getUser(nombreController.text.trim());
+                    if (rolUsuario == "Cliente") {
+                      Preferences.usuario = user.usuario;
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(builder: (context) => HomeScreen()),
+                      );
+                    } else if (rolUsuario == "Administrador") {
+                      Preferences.usuario = user.usuario;
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (context) => ListInstrumentScreen()),
+                      );
+                    }
                   } catch (e) {
+                    print(e);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         duration: const Duration(milliseconds: 1500),

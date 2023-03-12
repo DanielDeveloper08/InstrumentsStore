@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/modules/add_instrument/models/instrument.dart';
 import 'package:myapp/modules/aut/page/login_page.dart';
-import 'package:myapp/modules/cart/services/cart_provider.dart';
+import 'package:myapp/modules/view-client/page/home_screen.dart';
+import 'package:myapp/modules/view-client/services/instruments_providers.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +18,7 @@ class CarritoScreen extends StatefulWidget {
 class _CarritoScreenState extends State<CarritoScreen> {
   @override
   Widget build(BuildContext context) {
-    final cartProvider = Provider.of<CartProvider>(context);
+    final cartProvider = Provider.of<InstrumentosProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Shopping Cart"),
@@ -44,7 +46,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                               placeholder:
                                   const AssetImage("assets/jar-loading.gif"),
                               image: NetworkImage(
-                                  "https://gestion.promo.ec/${cartProvider.carProducts[index].imagenUrl[0]}"),
+                                  cartProvider.carInstruments[index].imagenUrl),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -58,7 +60,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 5),
                               child: Text(
-                                cartProvider.carProducts[index].nombre,
+                                cartProvider.carInstruments[index].nombre,
                               ),
                             ),
                             Row(
@@ -70,15 +72,15 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                     onTap: () {
                                       setState(() {
                                         cartProvider.deleteProduct(
-                                            cartProvider.carProducts[index]);
+                                            cartProvider.carInstruments[index]);
                                       });
 
-                                      if (cartProvider.carProducts.isEmpty) {
+                                      if (cartProvider.carInstruments.isEmpty) {
                                         Navigator.of(context)
                                             .pushAndRemoveUntil(
                                                 MaterialPageRoute(
                                                     builder: (context) {
-                                          return const NewInstrumentScreen();
+                                          return const HomeScreen();
                                         }), (Route<dynamic> route) => false);
                                       }
                                     },
@@ -90,8 +92,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                         borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Icon(
-                                        Icons.add,
-                                        color: Colors.white,
+                                        Icons.remove,
+                                        color: Colors.black,
                                         size: 15,
                                       ),
                                     ),
@@ -110,7 +112,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                         () {
                                           cartProvider.totalAPagarProducto;
                                           cartProvider.addProductCar(
-                                              cartProvider.carProducts[index]);
+                                              cartProvider
+                                                  .carInstruments[index]);
                                         },
                                       );
                                     },
@@ -137,13 +140,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
                       SizedBox(
                         width: 30,
                         child: Text(
-                          cartProvider.carProducts[index].cantidad.toString(),
+                          cartProvider.carInstruments[index].cantidad
+                              .toString(),
                         ),
                       ),
                       SizedBox(
                         width: 80,
                         child: Text(
-                          "\$ ${double.parse(cartProvider.carProducts[index].precio) * cartProvider.carProducts[index].cantidad}",
+                          "\$ ${double.parse(cartProvider.carInstruments[index].precio) * cartProvider.carInstruments[index].cantidad}",
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -156,7 +160,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                 );
               },
               separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemCount: cartProvider.carProducts.length,
+              itemCount: cartProvider.carInstruments.length,
             ),
           ),
           SizedBox(
@@ -200,6 +204,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
         label: Row(
           children: const [
             Text("Confirmar compra"),
+            SizedBox(width: 10),
+            Icon(Icons.money_off_csred_outlined, color: Colors.white, size: 20)
           ],
         ),
         onPressed: () async {
@@ -227,10 +233,10 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     ElevatedButton(
                       child: const Text("Continuar"),
                       onPressed: () {
-                        cartProvider.limpiarCarrito();
+                        cartProvider.clearCar();
                         Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(builder: (context) {
-                          return const NewInstrumentScreen();
+                          return const HomeScreen();
                         }), (Route<dynamic> route) => false);
                       },
                     ),
