@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myapp/modules/aut/page/login_page.dart';
 import 'package:myapp/modules/user/models/user.dart';
 
 import '../../../main.dart';
@@ -61,16 +62,17 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                firebaseUIButton(context, "Registrarme", () {
+                firebaseUIButton(context, "Registrarme", () async {
                   if (_emailTextController.text.isNotEmpty &&
                       _userNameTextController.text.isNotEmpty &&
                       _passwordTextController.text.isNotEmpty) {
-                    FirebaseAuth.instance
-                        .createUserWithEmailAndPassword(
-                            email: _emailTextController.text,
-                            password: _passwordTextController.text)
-                        .then((value) {
-                      saveUser(Usuario(
+                    try {
+                      UserCredential userCredential = await FirebaseAuth
+                          .instance
+                          .createUserWithEmailAndPassword(
+                              email: _emailTextController.text,
+                              password: _passwordTextController.text);
+                      await saveUser(Usuario(
                           nombres: _userNameTextController.text,
                           correo: _emailTextController.text,
                           contrasenia: _passwordTextController.text));
@@ -106,11 +108,70 @@ class _RegisterUserScreenState extends State<RegisterUserScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const NewInstrumentScreen()));
-                    }).onError((error, stackTrace) {
-                      print("Error ${error.toString()}");
-                    });
+                              builder: (context) => const LoginPage()));
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'email-already-in-use') {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          duration: const Duration(milliseconds: 2000),
+                          content: Container(
+                            padding: const EdgeInsets.all(16),
+                            height: 50,
+                            decoration: const BoxDecoration(
+                              color: Color.fromARGB(255, 209, 46, 46),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20),
+                              ),
+                            ),
+                            child: Row(
+                              children: const [
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "Correo ya existente",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                        ));
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        duration: const Duration(milliseconds: 2000),
+                        content: Container(
+                          padding: const EdgeInsets.all(16),
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 209, 46, 46),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20),
+                            ),
+                          ),
+                          child: Row(
+                            children: const [
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Correo no valido",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                      ));
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       duration: const Duration(milliseconds: 2000),
